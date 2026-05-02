@@ -1,0 +1,492 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--ink:#0e0e0e;--paper:#fafaf7;--accent:#e8ff47;--muted:#888;--border:#e0e0d8;--card:#fff;--surface:#f3f3ee;--fd:'Bebas Neue',sans-serif;--fb:'DM Sans',sans-serif}
+body{font-family:var(--fb);background:var(--paper);color:var(--ink);min-height:100vh}
+header{background:var(--ink);color:var(--paper);padding:.85rem 1.75rem;display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid var(--accent)}
+.logo{font-family:var(--fd);font-size:1.8rem;letter-spacing:2px}
+.logo span{color:var(--accent)}
+.free-badge{background:var(--accent);color:var(--ink);font-size:10px;font-weight:500;padding:4px 12px;border-radius:20px;letter-spacing:1px}
+.workspace{display:grid;grid-template-columns:340px 1fr;min-height:calc(100vh - 63px)}
+.sidebar{background:var(--card);border-right:1px solid var(--border);overflow-y:auto;display:flex;flex-direction:column}
+.sec{padding:1.1rem 1.4rem;border-bottom:1px solid var(--border)}
+.slabel{font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:.8rem}
+.field{margin-bottom:.8rem}
+.field label{display:block;font-size:12px;font-weight:500;margin-bottom:5px}
+.field input,.field textarea,.field select{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 11px;font-family:var(--fb);font-size:13px;color:var(--ink);outline:none;transition:border .15s;resize:none}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--ink)}
+.field textarea{height:64px;line-height:1.5}
+.url-field{position:relative}
+.url-fetch{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:11px;background:var(--ink);color:var(--accent);border:none;border-radius:5px;padding:3px 9px;cursor:pointer;font-family:var(--fb)}
+.style-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.style-card{border:1.5px solid var(--border);border-radius:8px;padding:7px 5px;cursor:pointer;text-align:center;background:var(--surface);transition:all .15s}
+.style-card:hover{border-color:var(--ink)}
+.style-card.active{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.style-card .sname{font-size:11px;font-weight:500}
+.gen-btn{width:100%;background:var(--ink);color:var(--accent);border:none;border-radius:10px;padding:13px;font-family:var(--fd);font-size:1.25rem;letter-spacing:2px;cursor:pointer;transition:all .15s}
+.gen-btn:hover{background:#222;transform:translateY(-1px)}
+.gen-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.main{display:flex;flex-direction:column}
+.mhead{padding:.9rem 1.75rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.mtitle{font-family:var(--fd);font-size:1.35rem;letter-spacing:1px}
+.tabs{display:flex;gap:4px}
+.tab{padding:5px 12px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid transparent;transition:all .15s}
+.tab.active{background:var(--ink);color:var(--paper)}
+.tab:not(.active):hover{background:var(--surface)}
+.mbody{flex:1;padding:1.4rem 1.75rem;display:flex;flex-direction:column;gap:1.1rem}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;text-align:center;padding:3rem;gap:.9rem;min-height:280px}
+.empty-ico{font-size:2.5rem;opacity:.2}
+.empty-t{font-family:var(--fd);font-size:1.4rem;letter-spacing:1px;opacity:.3}
+.empty-s{font-size:13px;color:var(--muted);max-width:260px;line-height:1.6}
+.prog-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.2rem}
+.prog-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px}
+.prog-label{font-size:12px;font-weight:500}
+.prog-pct{font-size:12px;color:var(--muted)}
+.prog-bg{height:4px;background:var(--surface);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s ease}
+.scene-rows{margin-top:10px;display:flex;flex-direction:column;gap:5px}
+.scene-row{display:flex;align-items:center;gap:9px;font-size:12px;padding:6px 9px;border-radius:7px;background:var(--surface)}
+.sdot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-w{background:#ccc}
+.dot-g{background:var(--accent);animation:bl 1s infinite}
+.dot-d{background:#22c55e}
+.dot-e{background:#ff4d6d}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
+.sname{flex:1;font-weight:500}
+.sstat{font-size:10px;color:var(--muted)}
+.frames-section{display:flex;flex-direction:column;gap:1.1rem}
+.scene-block{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.scene-block-header{padding:.8rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
+.sbh-title{font-family:var(--fd);font-size:1rem;letter-spacing:1px}
+.sbh-tag{font-size:10px;color:var(--muted);font-weight:500}
+.frames-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:10px}
+.frame-wrap{position:relative;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:var(--ink);cursor:pointer}
+.frame-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .2s}
+.frame-wrap:hover img{transform:scale(1.04)}
+.frame-overlay{position:absolute;inset:0;background:rgba(0,0,0,.55);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;opacity:0;transition:opacity .2s}
+.frame-wrap:hover .frame-overlay{opacity:1}
+.dl-btn{background:var(--accent);color:var(--ink);border:none;border-radius:5px;padding:4px 10px;font-size:11px;font-weight:500;cursor:pointer;font-family:var(--fb)}
+.frame-num{position:absolute;top:6px;left:7px;font-size:9px;color:#fff;background:rgba(0,0,0,.5);padding:2px 6px;border-radius:4px;font-weight:500}
+.frame-loading{width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#555;font-size:11px}
+.script-area{display:flex;flex-direction:column;gap:10px}
+.script-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem 1.1rem}
+.script-card .sc-head{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+.sc-num{width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--paper);font-size:10px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sc-title{font-size:12px;font-weight:500;text-transform:uppercase;letter-spacing:.5px}
+.sc-headline{font-family:var(--fd);font-size:1.1rem;letter-spacing:1px;margin-bottom:4px}
+.sc-text{font-size:12px;color:#555;line-height:1.6;margin-bottom:6px}
+.sc-note{font-size:11px;font-style:italic;color:var(--muted);background:var(--surface);padding:5px 9px;border-radius:6px}
+.export-row{display:flex;gap:8px;flex-wrap:wrap}
+.exp-btn{flex:1;min-width:90px;padding:9px 12px;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);transition:all .15s;font-family:var(--fb)}
+.exp-btn:hover{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.exp-btn.pri{background:var(--ink);color:var(--accent);border-color:var(--ink)}
+.tip{font-size:11px;color:var(--muted);line-height:1.5;padding:7px 10px;background:var(--surface);border-radius:7px;border-left:2px solid var(--accent)}
+.product-preview{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;font-size:12px;display:flex;align-items:center;gap:8px}
+.pp-img{width:40px;height:40px;border-radius:6px;object-fit:cover;background:var(--border)}
+.pp-info .pp-name{font-weight:500;margin-bottom:2px}
+.pp-info .pp-url{font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">PROMO<span>AI</span></div>
+  <span class="free-badge">100% FREE — No API Key</span>
+</header>
+<div class="workspace">
+  <div class="sidebar">
+
+    <div class="sec">
+      <div class="slabel">Shop Link (optional)</div>
+      <div class="field url-field">
+        <input type="text" id="shopUrl" placeholder="https://yourshop.com/product" />
+        <button class="url-fetch" onclick="fetchFromUrl()">Fetch</button>
+      </div>
+      <div id="productPreview" style="display:none" class="product-preview">
+        <div class="pp-info">
+          <div class="pp-name" id="ppName"></div>
+          <div class="pp-url" id="ppUrl"></div>
+        </div>
+      </div>
+      <div class="tip">Paste any product URL and click Fetch to auto-fill your details from the page title.</div>
+    </div>
+
+    <div class="sec">
+      <div class="slabel">Brand Details</div>
+      <div class="field">
+        <label>Product / Brand name</label>
+        <input type="text" id="product" placeholder="e.g. FitTrack Pro smartwatch" />
+      </div>
+      <div class="field">
+        <label>Key selling point</label>
+        <input type="text" id="selling" placeholder="e.g. 50+ health metrics" />
+      </div>
+      <div class="field">
+        <label>Target audience</label>
+        <input type="text" id="audience" placeholder="e.g. fitness enthusiasts" />
+      </div>
+      <div class="field">
+        <label>Call to action</label>
+        <input type="text" id="cta" placeholder="e.g. Shop now at fittrack.com" />
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="slabel">Visual Style</div>
+      <div class="style-grid">
+        <div class="style-card active" data-style="bold dramatic commercial photography, professional studio lighting, 4K" onclick="selectStyle(this)"><div class="sname">Bold</div></div>
+        <div class="style-card" data-style="luxury lifestyle photography, golden hour light, elegant minimalist" onclick="selectStyle(this)"><div class="sname">Luxury</div></div>
+        <div class="style-card" data-style="vibrant colorful playful product photography, bright background" onclick="selectStyle(this)"><div class="sname">Playful</div></div>
+        <div class="style-card" data-style="clean minimal white studio product photography, sharp focus" onclick="selectStyle(this)"><div class="sname">Minimal</div></div>
+        <div class="style-card" data-style="cinematic epic wide angle dramatic outdoor photography" onclick="selectStyle(this)"><div class="sname">Cinematic</div></div>
+        <div class="style-card" data-style="trendy social media flat lay product photography, pastel colors" onclick="selectStyle(this)"><div class="sname">Social</div></div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="field">
+        <label>Number of scenes</label>
+        <select id="sceneCount">
+          <option value="2">2 scenes</option>
+          <option value="3" selected>3 scenes</option>
+          <option value="4">4 scenes</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Frames per scene</label>
+        <select id="framesPerScene">
+          <option value="2">2 frames (faster)</option>
+          <option value="3" selected>3 frames</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sec">
+      <button class="gen-btn" id="genBtn" onclick="startGeneration()">GENERATE VIDEO →</button>
+      <div style="margin-top:9px" class="tip">Uses Pollinations AI (free, no signup) to generate storyboard frames for each scene.</div>
+    </div>
+
+  </div>
+
+  <div class="main">
+    <div class="mhead">
+      <div class="mtitle">STORYBOARD</div>
+      <div class="tabs">
+        <div class="tab active" onclick="switchTab(this,"frames")">Frames</div>
+        <div class="tab" onclick="switchTab(this,"script")">Script</div>
+      </div>
+    </div>
+
+    <div id="tabFrames" class="mbody">
+      <div id="emptyState" class="empty">
+        <div class="empty-ico">&#9654;</div>
+        <div class="empty-t">Nothing here yet</div>
+        <div class="empty-s">Fill in your product details and hit Generate. Free AI image frames will be created for each scene — no API key, no cost.</div>
+      </div>
+      <div id="progSection" style="display:none" class="prog-card">
+        <div class="prog-row">
+          <div class="prog-label" id="progLabel">Writing scene prompts...</div>
+          <div class="prog-pct" id="progPct">0%</div>
+        </div>
+        <div class="prog-bg"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+        <div class="scene-rows" id="sceneRows"></div>
+      </div>
+      <div id="framesSection" class="frames-section" style="display:none"></div>
+      <div id="exportSection" style="display:none">
+        <div class="slabel" style="margin-bottom:8px">Export & Next Steps</div>
+        <div class="export-row">
+          <button class="exp-btn pri" onclick="downloadAll()">&#8595; Download All Frames</button>
+          <button class="exp-btn" onclick="openCapCut()">&#9654; Open in CapCut</button>
+          <button class="exp-btn" onclick="copyScript()">&#8999; Copy Script</button>
+        </div>
+        <div style="margin-top:10px" class="tip">Import your downloaded frames into <strong>CapCut</strong>, <strong>DaVinci Resolve</strong>, or <strong>Canva</strong> to assemble the final video for free.</div>
+      </div>
+    </div>
+
+    <div id="tabScript" class="mbody" style="display:none">
+      <div id="scriptContent">
+        <div class="empty">
+          <div class="empty-t">No script yet</div>
+          <div class="empty-s">Generate a video to see the scene-by-scene script.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentStyle = 'bold dramatic commercial photography, professional studio lighting, 4K';
+let allScenes = [];
+let allFrameUrls = [];
+
+function selectStyle(el){
+  document.querySelectorAll('.style-card').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  currentStyle = el.dataset.style;
+}
+
+function switchTab(el, tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tabFrames').style.display = tab==='frames'?'flex':'none';
+  if(tab==='frames') document.getElementById('tabFrames').style.flexDirection='column';
+  document.getElementById('tabScript').style.display = tab==='script'?'flex':'none';
+  if(tab==='script') document.getElementById('tabScript').style.flexDirection='column';
+}
+
+async function fetchFromUrl(){
+  const url = document.getElementById('shopUrl').value.trim();
+  if(!url) return;
+  try {
+    const proxyUrl = 'https://api.allorigins.win/get?url='+encodeURIComponent(url);
+    const r = await fetch(proxyUrl);
+    const d = await r.json();
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(d.contents,'text/html');
+    const title = doc.querySelector('meta[property="og:title"]')?.content
+      || doc.querySelector('title')?.textContent
+      || '';
+    const desc = doc.querySelector('meta[property="og:description"]')?.content
+      || doc.querySelector('meta[name="description"]')?.content
+      || '';
+    if(title){
+      document.getElementById('product').value = title.split('|')[0].split('-')[0].trim();
+      document.getElementById('selling').value = desc.split('.')[0].trim().substring(0,80);
+      document.getElementById('cta').value = 'Shop now at '+new URL(url).hostname.replace('www.','');
+      document.getElementById('ppName').textContent = title.substring(0,50);
+      document.getElementById('ppUrl').textContent = url;
+      document.getElementById('productPreview').style.display='flex';
+    }
+  } catch(e) {
+    const u = document.getElementById('shopUrl').value;
+    try {
+      const hostname = new URL(u).hostname.replace('www.','');
+      document.getElementById('product').value = hostname;
+      document.getElementById('cta').value = 'Shop now at '+hostname;
+      document.getElementById('ppName').textContent = hostname;
+      document.getElementById('ppUrl').textContent = u;
+      document.getElementById('productPreview').style.display='flex';
+    } catch(e2){}
+  }
+}
+
+function setProgress(pct, label){
+  document.getElementById('progFill').style.width = pct+'%';
+  document.getElementById('progPct').textContent = Math.round(pct)+'%';
+  if(label) document.getElementById('progLabel').textContent = label;
+}
+
+function updateDot(idx, status, note){
+  const dot = document.getElementById('dot'+idx);
+  const stat = document.getElementById('stat'+idx);
+  if(dot) dot.className = 'sdot dot-'+status;
+  if(stat && note) stat.textContent = note;
+}
+
+async function startGeneration(){
+  const product = document.getElementById('product').value.trim();
+  const selling = document.getElementById('selling').value.trim();
+  const audience = document.getElementById('audience').value.trim();
+  const cta = document.getElementById('cta').value.trim();
+  const sceneCount = parseInt(document.getElementById('sceneCount').value);
+  const framesPerScene = parseInt(document.getElementById('framesPerScene').value);
+
+  if(!product){alert('Please enter your product or brand name!');return;}
+
+  const btn = document.getElementById('genBtn');
+  btn.disabled=true;
+  btn.textContent='GENERATING...';
+  allScenes=[];allFrameUrls=[];
+
+  document.getElementById('emptyState').style.display='none';
+  document.getElementById('progSection').style.display='block';
+  document.getElementById('framesSection').style.display='none';
+  document.getElementById('exportSection').style.display='none';
+  document.getElementById('framesSection').innerHTML='';
+
+  setProgress(5,'Writing scene concepts with AI...');
+
+  const prompt = `You are a video director creating a promotional storyboard.
+
+Product: ${product}
+Key point: ${selling||'premium product'}
+Audience: ${audience||'general consumers'}
+CTA: ${cta||'Shop now'}
+Style: ${currentStyle}
+
+Create exactly ${sceneCount} scenes. Return ONLY a JSON array, no markdown, no backticks:
+[
+  {
+    "id": 1,
+    "title": "Hook",
+    "headline": "SHORT PUNCHY TEXT MAX 5 WORDS",
+    "narration": "Voiceover line for this scene, 1 sentence.",
+    "frames": [
+      "Detailed image generation prompt for frame 1, describe exactly what to show visually, include product, ${currentStyle}, commercial ad quality, ultra detailed",
+      "Detailed image generation prompt for frame 2",
+      "Detailed image generation prompt for frame 3"
+    ]
+  }
+]
+Each frame prompt must be highly visual, specific, and describe a real scene. Include the product "${product}" naturally. Keep each frame prompt under 200 characters.`;
+
+  let scenes;
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1500,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    const data = await res.json();
+    const raw = data.content.map(i=>i.text||'').join('');
+    const clean = raw.replace(/```json|```/g,'').trim();
+    scenes = JSON.parse(clean);
+    scenes = scenes.map(s=>({...s, frames: s.frames.slice(0, framesPerScene)}));
+    allScenes = scenes;
+  } catch(e) {
+    scenes = Array.from({length:sceneCount},(_,i)=>({
+      id:i+1,
+      title:['Hook','Product','Lifestyle','CTA'][i]||'Scene '+(i+1),
+      headline:['INTRODUCING '+product.toUpperCase().split(' ')[0],'PREMIUM QUALITY','CHANGE YOUR LIFE','GET YOURS TODAY'][i]||'SCENE '+(i+1),
+      narration: i===0?'Introducing '+product+', the future of '+selling+'.':i===sceneCount-1?cta:'Experience the difference with '+product+'.',
+      frames: Array.from({length:framesPerScene},(_,j)=>`${product} promotional ad, ${currentStyle}, frame ${j+1}, professional photography`)
+    }));
+    allScenes = scenes;
+  }
+
+  const rows = document.getElementById('sceneRows');
+  rows.innerHTML = scenes.map((s,i)=>`
+    <div class="scene-row">
+      <div class="sdot dot-w" id="dot${i}"></div>
+      <div class="sname">${s.title}</div>
+      <div class="sstat" id="stat${i}">waiting</div>
+    </div>`).join('');
+
+  const framesSection = document.getElementById('framesSection');
+  framesSection.innerHTML = '';
+
+  const totalFrames = scenes.reduce((a,s)=>a+s.frames.length,0);
+  let done = 0;
+
+  for(let si=0; si<scenes.length; si++){
+    const scene = scenes[si];
+    updateDot(si,'g','generating...');
+    setProgress(10 + (si/scenes.length)*80, `Generating scene ${si+1}: ${scene.title}...`);
+
+    const block = document.createElement('div');
+    block.className = 'scene-block';
+    block.innerHTML = `
+      <div class="scene-block-header">
+        <div class="sbh-title">Scene ${scene.id} — ${scene.title}</div>
+        <div class="sbh-tag">${scene.frames.length} frames</div>
+      </div>
+      <div class="frames-row" id="framesRow${si}"></div>`;
+    framesSection.appendChild(block);
+    framesSection.style.display='flex';
+
+    const row = document.getElementById('framesRow'+si);
+
+    const framePromises = scene.frames.map((fp, fi) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'frame-wrap';
+      wrap.innerHTML = `<div class="frame-loading">generating...</div>`;
+      row.appendChild(wrap);
+
+      const imageUrl = 'https://image.pollinations.ai/prompt/'+encodeURIComponent(fp+'&nologo=true&enhance=true')+'?width=1280&height=720&nologo=true';
+      allFrameUrls.push({url:imageUrl, scene:si+1, frame:fi+1, sceneTitle:scene.title});
+
+      return new Promise(resolve=>{
+        const img = new Image();
+        img.onload = ()=>{
+          wrap.innerHTML = `
+            <img src="${imageUrl}" alt="Scene ${si+1} Frame ${fi+1}" />
+            <div class="frame-num">S${si+1} F${fi+1}</div>
+            <div class="frame-overlay">
+              <button class="dl-btn" onclick="downloadFrame('${imageUrl}','scene${si+1}_frame${fi+1}.jpg')">Download</button>
+            </div>`;
+          done++;
+          setProgress(10+(done/totalFrames)*80, `Generated ${done}/${totalFrames} frames...`);
+          resolve();
+        };
+        img.onerror = ()=>{
+          wrap.innerHTML = `<div class="frame-loading" style="color:#ff4d6d">failed — retrying</div>`;
+          setTimeout(()=>{
+            const img2 = new Image();
+            const fallback = 'https://image.pollinations.ai/prompt/'+encodeURIComponent(fp)+'?width=1280&height=720&nologo=true';
+            img2.onload = ()=>{
+              wrap.innerHTML = `<img src="${fallback}" alt="Frame" /><div class="frame-num">S${si+1} F${fi+1}</div><div class="frame-overlay"><button class="dl-btn" onclick="downloadFrame('${fallback}','scene${si+1}_frame${fi+1}.jpg')">Download</button></div>`;
+              done++;resolve();
+            };
+            img2.onerror = ()=>{wrap.innerHTML=`<div class="frame-loading" style="color:#ff4d6d">could not load</div>`;done++;resolve();};
+            img2.src = fallback;
+          },2000);
+        };
+        img.src = imageUrl;
+      });
+    });
+
+    await Promise.all(framePromises);
+    updateDot(si,'d','done');
+  }
+
+  renderScript(scenes, product, cta);
+  setProgress(100,'All frames generated!');
+  document.getElementById('exportSection').style.display='block';
+  btn.disabled=false;
+  btn.textContent='REGENERATE →';
+}
+
+function renderScript(scenes, product, cta){
+  const el = document.getElementById('scriptContent');
+  el.innerHTML = `<div class="slabel" style="margin-bottom:10px">Full Script</div><div class="script-area">`+
+    scenes.map(s=>`
+      <div class="script-card">
+        <div class="sc-head">
+          <div class="sc-num">${s.id}</div>
+          <div class="sc-title">${s.title}</div>
+        </div>
+        <div class="sc-headline">${s.headline}</div>
+        <div class="sc-text">${s.narration}</div>
+        <div class="sc-note">Frames: ${s.frames.length} image frames generated</div>
+      </div>`).join('')+
+    `<div style="background:var(--ink);border-radius:10px;padding:1rem;text-align:center">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:2px;color:var(--accent)">${cta||'Shop Now'}</div>
+    </div></div>`;
+}
+
+function downloadFrame(url, filename){
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.target = '_blank';
+  a.click();
+}
+
+function downloadAll(){
+  if(!allFrameUrls.length){alert('No frames to download yet!');return;}
+  allFrameUrls.forEach((f,i)=>{
+    setTimeout(()=>downloadFrame(f.url, `promo_scene${f.scene}_frame${f.frame}.jpg`), i*600);
+  });
+}
+
+function openCapCut(){
+  window.open('https://www.capcut.com','_blank');
+}
+
+function copyScript(){
+  if(!allScenes.length){alert('No script yet!');return;}
+  const text = allScenes.map(s=>`SCENE ${s.id}: ${s.title}\n${s.headline}\n${s.narration}\n`).join('\n');
+  navigator.clipboard.writeText(text);
+  alert('Script copied to clipboard!');
+}
+</script>
+</body>
+</html>
